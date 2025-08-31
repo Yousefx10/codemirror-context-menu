@@ -18,3 +18,20 @@
   padding: 4px 12px;
   cursor: default;
 }
+
+
+.cm-menu-item:hover {
+  background: #094771;
+  color: #fff;
+}
+
+.cm-shortcut {
+  color: #999;
+  margin-left: 16px;
+}
+
+.cm-separator {
+  height: 1px;
+  background: #333;
+  margin: 4px 0;
+}
