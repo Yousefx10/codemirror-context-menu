@@ -12,6 +12,7 @@ export function contextMenuExtension(options = {}) {
     enableCut: options.enableCut ?? true,
     enablePaste: options.enablePaste ?? true,
     enableSelectAll: options.enableSelectAll ?? true,
+    customItems: options.customItems ?? []   //This is for Custom Items that is added through the EXTENSIONS block in main javascript file
   }
 
   return EditorView.domEventHandlers({
@@ -76,7 +77,7 @@ export function contextMenuExtension(options = {}) {
           }
         })
       }
-
+      
       // Render copy/cut/paste if any are enabled
       if (group.length > 0) {
         group.forEach(item => {
@@ -95,7 +96,7 @@ export function contextMenuExtension(options = {}) {
       }
 
       // Separator if both groups exist
-      if (group.length > 0 && settings.enableSelectAll) {
+      if (group.length > 0 && (settings.enableSelectAll || settings.customItems.length > 0)) {
         const separator = document.createElement("div")
         separator.className = "cm-separator"
         menu.appendChild(separator)
@@ -120,6 +121,28 @@ export function contextMenuExtension(options = {}) {
         })
         menu.appendChild(selectAllItem)
       }
+
+      // Separator before custom items
+      if (settings.customItems.length > 0) {
+        const separator = document.createElement("div")
+        separator.className = "cm-separator"
+        menu.appendChild(separator)
+      }
+
+      // --- Custom Items ---
+      settings.customItems.forEach(item => {
+        const row = document.createElement("div")
+        row.className = "cm-menu-item"
+        row.innerHTML = `
+          <span class="cm-label">${item.label}</span>
+          ${item.shortcut ? `<span class="cm-shortcut">${item.shortcut}</span>` : ""}
+        `
+        row.addEventListener("click", () => {
+          item.command(view)   // call user function
+          menu.remove()
+        })
+        menu.appendChild(row)
+      })
 
       // Position menu
       menu.style.top = event.clientY + "px"
