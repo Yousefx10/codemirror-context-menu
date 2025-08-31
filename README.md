@@ -13,7 +13,12 @@ new EditorView({
   extensions: [
     basicSetup,
     javascript(),
-    contextMenuExtension()
+    contextMenuExtension({
+      enableCopy: true,
+      enableCut: false,
+      enablePaste: true,
+      enableSelectAll: false
+    })
   ],
   parent: document.querySelector("#editor")
 })
