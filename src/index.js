@@ -1,34 +1,23 @@
-// Imports CodeMirror 6 components
 import {EditorView} from "@codemirror/view"
 import {selectAll} from "@codemirror/commands"
 
-
-//function to get currently selected text inside CodeMirror
 function getSelectedText(view) {
   const {from, to} = view.state.selection.main
   return view.state.doc.sliceString(from, to)
 }
 
-
-
-
-
-
-//EXPORT FUNCTION
-export function customContextMenu() {
+export function contextMenuExtension() {
   return EditorView.domEventHandlers({
     contextmenu(event, view) {
       event.preventDefault()
-      event.stopPropagation() //to prevent cursor reset
+      event.stopPropagation()
 
-      // Remove old menu if exists
       document.querySelector(".cm-context-menu")?.remove()
 
-      // Build menu
       const menu = document.createElement("div")
       menu.className = "cm-context-menu"
 
-      // THE First group: Copy / Cut / Paste
+      // Copy, Cut, Paste
       ;[
         {
           label: "Copy",
@@ -46,11 +35,7 @@ export function customContextMenu() {
             if (text) {
               await navigator.clipboard.writeText(text)
               view.dispatch({
-                changes: {
-                  from: view.state.selection.main.from,
-                  to: view.state.selection.main.to,
-                  insert: ""
-                }
+                changes: {from: view.state.selection.main.from, to: view.state.selection.main.to, insert: ""}
               })
             }
           }
@@ -62,11 +47,7 @@ export function customContextMenu() {
             const text = await navigator.clipboard.readText()
             if (text) {
               view.dispatch({
-                changes: {
-                  from: view.state.selection.main.from,
-                  to: view.state.selection.main.to,
-                  insert: text
-                }
+                changes: {from: view.state.selection.main.from, to: view.state.selection.main.to, insert: text}
               })
             }
           }
@@ -90,7 +71,7 @@ export function customContextMenu() {
       separator.className = "cm-separator"
       menu.appendChild(separator)
 
-      //THE Second group: Select All
+      // Select All
       const selectAllItem = document.createElement("div")
       selectAllItem.className = "cm-menu-item"
       selectAllItem.innerHTML = `
@@ -98,21 +79,17 @@ export function customContextMenu() {
         <span class="cm-shortcut">Ctrl+A</span>
       `
       selectAllItem.addEventListener("click", () => {
-        // Update CodeMirror selection
         selectAll(view)
-
-        // Also sync with DOM selection for "native" highlight
         const range = document.createRange()
-        range.selectNodeContents(view.contentDOM)   //only the code area
+        range.selectNodeContents(view.contentDOM)
         const sel = window.getSelection()
         sel.removeAllRanges()
         sel.addRange(range)
-
         menu.remove()
       })
       menu.appendChild(selectAllItem)
 
-      // Position menu near cursor
+      // Position menu
       menu.style.top = event.clientY + "px"
       menu.style.left = event.clientX + "px"
       document.body.appendChild(menu)
