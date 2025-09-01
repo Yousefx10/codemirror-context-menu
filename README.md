@@ -1,97 +1,70 @@
-## Usage / Example
-#### CodeMirror 6
 
----
-```javascript
-import {EditorView, basicSetup} from "codemirror"
-import {javascript} from "@codemirror/lang-javascript"
-import {contextMenuExtension} from "cm-context-menu"
-import "cm-context-menu/style.css" // important!
+# Context Menu for CodeMirror v6
 
-new EditorView({
-  doc: "console.log('Hello!')",
-  extensions: [
-    basicSetup,
-    javascript(),
-    contextMenuExtension({
-      enableCopy: true,
-      enableCut: false,
-      enablePaste: true,
-      enableSelectAll: false
-    })
-  ],
-  parent: document.querySelector("#editor")
-})
+This package serves the people who need to have a custom and clean context menu.
 
+![Screenshot](README/screenshot.png)
+## Get Started
+
+Clone the project
+
+```bash
+  git clone https://github.com/Yousefx10/codemirror-context-menu
 ```
----
-#### Example for custom menu item
-```javascript
-{
-  label: "Format Code",
-  shortcut: "Ctrl+Shift+F",
-  command: (view) => {
-    // user-defined function
-    myFormatter(view.state.doc.toString())
-  }
-}
-```
----
-#### Usage for custom menu item with selected content
-```javascript
-import {EditorView, basicSetup} from "codemirror"
-import {javascript} from "@codemirror/lang-javascript"
+
+Import project to your main javascript code
+
+```bash
 import {contextMenuExtension} from "cm-context-menu"
-import "cm-context-menu/style.css" // important!
+```
 
+Add it to the EXTENSIONS
 
-function myCustomAction(text) {
-  alert("You selected:\n\n" + text)
-}
-
-const editor = new EditorView({
-  doc: "console.log('Hello!')",
-  extensions: [
-    javascript(),
-
-    contextMenuExtension({
-      enableCopy: true,
-      enableCut: false,
-      enablePaste: true,
-
-      customItems: [
-
-        {
-          label: "Alert Selection",
-          shortcut: "Alt+A",
-          command: (view) => {
-            const selected = view.state.sliceDoc(
-              view.state.selection.main.from,
-              view.state.selection.main.to
-            )
-            myCustomAction(selected)
-          }
-        },
-
-        {
-          label: "Log Editor Content",
-          command: (view) => {
-            console.log(view.state.doc.toString())
-          }
-        }
-
+```bash
+      extensions: [
+        contextMenuExtension({})
       ]
-
-
-    })
-  ],
-  parent: document.querySelector("#editor")
-})
-
 ```
----
-### DARK or LIGHT theme
+## Available variables
+
+There's a good set of variables which allows you to control how the context menu acts
 ```javascript
-// by default it's dark theme for the context menu, to change it to light just update the theme value
-contextMenuExtension({ theme: "light" })
+    enableUndoRedo: true,
+    enableCopy: true,
+    enableCut: true,
+    enablePaste: true,
+    enableSelectAll: true,
+    theme: "light" //[dark] / [light]
 ```
+## Custom item
+
+You still can add your own item inside the context menu, and point it to specific function
+
+```bash
+  customItems[
+    {
+        label: "Example name",
+        shortcut: "Ctrl+Shift+F",
+        command: (view) => {
+
+            // user-defined function
+            DoSomething();
+
+        }
+    }
+  ]
+```
+
+## Table Guide
+
+| Option             | Description                                                                |
+| ----------------- | ------------------------------------------------------------------ |
+| enableUndoRedo |(True / False) Show or hide the HISTORY (Undo + Redo) options |
+| enableCopy |(True / False) Show or hide the Copy option |
+| enableCut |(True / False) Show or hide the Cut option |
+| enablePaste |(True / False) Show or hide the Paste option |
+| enableSelectAll |(True / False) Show or hide Select All option |
+| theme |(dark / light) can be choosed |
+| customItems |allows you to add your custom label, just follow API instructions |
+
+
