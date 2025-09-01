@@ -6,14 +6,69 @@ function getSelectedText(view) {
   return view.state.doc.sliceString(from, to)
 }
 
+
+//getting rid of style.css, and now it will be managed through the js
+function injectMenuStyles(theme) {
+  // Remove old styles if any
+  document.getElementById("cm-context-styles")?.remove()
+
+  const style = document.createElement("style")
+  style.id = "cm-context-styles"
+
+  style.textContent = `
+    .cm-context-menu {
+      position: absolute;
+      z-index: 9999;
+      padding: 4px 0;
+      border-radius: 6px;
+      font-family: sans-serif;
+      font-size: 13px;
+      min-width: 180px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      user-select: none;
+    }
+    .cm-menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 12px;
+      cursor: pointer;
+    }
+    .cm-menu-item:hover {
+      background: ${theme === "dark" ? "#3a3d41" : "#e5e5e5"};
+    }
+    .cm-label { }
+    .cm-shortcut {
+      opacity: 0.6;
+      font-size: 12px;
+    }
+    .cm-separator {
+      height: 1px;
+      margin: 4px 0;
+      background: ${theme === "dark" ? "#555" : "#ccc"};
+    }
+    /* Theme backgrounds & colors */
+    .cm-context-menu {
+      background: ${theme === "dark" ? "#252526" : "#fff"};
+      color: ${theme === "dark" ? "#f3f3f3" : "#222"};
+      border: 1px solid ${theme === "dark" ? "#333" : "#ccc"};
+    }
+  `
+  document.head.appendChild(style)
+}
+
 export function contextMenuExtension(options = {}) {
   const settings = {
     enableCopy: options.enableCopy ?? true,
     enableCut: options.enableCut ?? true,
     enablePaste: options.enablePaste ?? true,
     enableSelectAll: options.enableSelectAll ?? true,
-    customItems: options.customItems ?? []   //This is for Custom Items that is added through the EXTENSIONS block in main javascript file 
+    customItems: options.customItems ?? [],
+    theme: options.theme ?? "dark"   // default = dark
   }
+
+  // Inject styles based on theme
+  injectMenuStyles(settings.theme)
 
   return EditorView.domEventHandlers({
     contextmenu(event, view) {
@@ -21,7 +76,6 @@ export function contextMenuExtension(options = {}) {
       event.stopPropagation()
 
       document.querySelector(".cm-context-menu")?.remove()
-
       const menu = document.createElement("div")
       menu.className = "cm-context-menu"
 
@@ -48,11 +102,7 @@ export function contextMenuExtension(options = {}) {
             if (text) {
               await navigator.clipboard.writeText(text)
               view.dispatch({
-                changes: {
-                  from: view.state.selection.main.from,
-                  to: view.state.selection.main.to,
-                  insert: ""
-                }
+                changes: { from: view.state.selection.main.from, to: view.state.selection.main.to, insert: "" }
               })
             }
           }
@@ -67,18 +117,13 @@ export function contextMenuExtension(options = {}) {
             const text = await navigator.clipboard.readText()
             if (text) {
               view.dispatch({
-                changes: {
-                  from: view.state.selection.main.from,
-                  to: view.state.selection.main.to,
-                  insert: text
-                }
+                changes: { from: view.state.selection.main.from, to: view.state.selection.main.to, insert: text }
               })
             }
           }
         })
       }
-      
-      // Render copy/cut/paste if any are enabled 
+
       if (group.length > 0) {
         group.forEach(item => {
           const row = document.createElement("div")
@@ -88,7 +133,7 @@ export function contextMenuExtension(options = {}) {
             <span class="cm-shortcut">${item.shortcut}</span>
           `
           row.addEventListener("click", () => {
-            view.focus()       // restore focus to the editor
+            view.focus()
             item.command(view)
             menu.remove()
           })
@@ -96,14 +141,12 @@ export function contextMenuExtension(options = {}) {
         })
       }
 
-      // Separator if both groups exist
       if (group.length > 0 && (settings.enableSelectAll || settings.customItems.length > 0)) {
         const separator = document.createElement("div")
         separator.className = "cm-separator"
         menu.appendChild(separator)
       }
 
-      // --- Select All ---
       if (settings.enableSelectAll) {
         const selectAllItem = document.createElement("div")
         selectAllItem.className = "cm-menu-item"
@@ -112,7 +155,7 @@ export function contextMenuExtension(options = {}) {
           <span class="cm-shortcut">Ctrl+A</span>
         `
         selectAllItem.addEventListener("click", () => {
-          view.focus()   // restore focus to the editor
+          view.focus()
           selectAll(view)
           const range = document.createRange()
           range.selectNodeContents(view.contentDOM)
@@ -124,14 +167,12 @@ export function contextMenuExtension(options = {}) {
         menu.appendChild(selectAllItem)
       }
 
-      // Separator before custom items
       if (settings.customItems.length > 0) {
         const separator = document.createElement("div")
         separator.className = "cm-separator"
         menu.appendChild(separator)
       }
 
-      // --- Custom Items ---
       settings.customItems.forEach(item => {
         const row = document.createElement("div")
         row.className = "cm-menu-item"
@@ -140,19 +181,17 @@ export function contextMenuExtension(options = {}) {
           ${item.shortcut ? `<span class="cm-shortcut">${item.shortcut}</span>` : ""}
         `
         row.addEventListener("click", () => {
-          view.focus()   // restore focus to the editor
+          view.focus()
           item.command(view)
           menu.remove()
         })
         menu.appendChild(row)
       })
 
-      // Position menu
       menu.style.top = event.clientY + "px"
       menu.style.left = event.clientX + "px"
       document.body.appendChild(menu)
 
-      // Close menu on outside click
       const remove = () => menu.remove()
       setTimeout(() => {
         document.addEventListener("click", remove, {once: true})
