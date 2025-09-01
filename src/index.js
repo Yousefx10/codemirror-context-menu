@@ -1,17 +1,16 @@
 import {EditorView} from "@codemirror/view"
-import {selectAll} from "@codemirror/commands"
+import {selectAll, undo, redo} from "@codemirror/commands"
 
 function getSelectedText(view) {
   const {from, to} = view.state.selection.main
   return view.state.doc.sliceString(from, to)
 }
 
-
-//getting rid of style.css, and now it will be managed through the js
+//getting rid of style.css, and now it will be managed through the js 
 function injectMenuStyles(theme) {
-  // Remove old styles if any
+  // Remove old styles if any 
   document.getElementById("cm-context-styles")?.remove()
-
+  
   const style = document.createElement("style")
   style.id = "cm-context-styles"
 
@@ -23,7 +22,7 @@ function injectMenuStyles(theme) {
       border-radius: 6px;
       font-family: sans-serif;
       font-size: 13px;
-      min-width: 180px;
+      min-width: 190px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.25);
       user-select: none;
     }
@@ -37,7 +36,7 @@ function injectMenuStyles(theme) {
     .cm-menu-item:hover {
       background: ${theme === "dark" ? "#3a3d41" : "#e5e5e5"};
     }
-    .cm-label { }
+    .cm-label {}
     .cm-shortcut {
       opacity: 0.6;
       font-size: 12px;
@@ -48,6 +47,23 @@ function injectMenuStyles(theme) {
       background: ${theme === "dark" ? "#555" : "#ccc"};
     }
     /* Theme backgrounds & colors */
+    
+    /* Special row for Undo/Redo */
+    .cm-undo-redo {
+      display: flex;
+      gap: 8px;
+    }
+    .cm-btn {
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      border: 1px solid ${theme === "dark" ? "#444" : "#bbb"};
+      background: ${theme === "dark" ? "#2f2f2f" : "#f5f5f5"};
+    }
+    .cm-btn:hover {
+      background: ${theme === "dark" ? "#454545" : "#e0e0e0"};
+    }
     .cm-context-menu {
       background: ${theme === "dark" ? "#252526" : "#fff"};
       color: ${theme === "dark" ? "#f3f3f3" : "#222"};
@@ -63,11 +79,11 @@ export function contextMenuExtension(options = {}) {
     enableCut: options.enableCut ?? true,
     enablePaste: options.enablePaste ?? true,
     enableSelectAll: options.enableSelectAll ?? true,
+    enableUndoRedo: options.enableUndoRedo ?? true, // option to enable or disable the UNDO + REDO, it's enabled by default
     customItems: options.customItems ?? [],
     theme: options.theme ?? "dark"   // default = dark
   }
-
-  // Inject styles based on theme
+  // Inject styles based on theme 
   injectMenuStyles(settings.theme)
 
   return EditorView.domEventHandlers({
@@ -78,6 +94,43 @@ export function contextMenuExtension(options = {}) {
       document.querySelector(".cm-context-menu")?.remove()
       const menu = document.createElement("div")
       menu.className = "cm-context-menu"
+
+      // --- Undo/Redo row ---
+      if (settings.enableUndoRedo) {
+        const undoRedoRow = document.createElement("div")
+        undoRedoRow.className = "cm-menu-item"
+        undoRedoRow.innerHTML = `
+          <span class="cm-label">History</span>
+          <div class="cm-undo-redo">
+            <button class="cm-btn">Undo</button>
+            <button class="cm-btn">Redo</button>
+          </div>
+        `
+        const [undoBtn, redoBtn] = undoRedoRow.querySelectorAll(".cm-btn")
+        undoBtn.addEventListener("click", () => {
+          view.focus()
+          undo(view)
+          menu.remove()
+        })
+        redoBtn.addEventListener("click", () => {
+          view.focus()
+          redo(view)
+          menu.remove()
+        })
+        menu.appendChild(undoRedoRow)
+
+        if (
+          settings.enableCopy ||
+          settings.enableCut ||
+          settings.enablePaste ||
+          settings.enableSelectAll ||
+          settings.customItems.length > 0
+        ) {
+          const sep = document.createElement("div")
+          sep.className = "cm-separator"
+          menu.appendChild(sep)
+        }
+      }
 
       // --- Copy, Cut, Paste group ---
       const group = []
@@ -147,6 +200,7 @@ export function contextMenuExtension(options = {}) {
         menu.appendChild(separator)
       }
 
+      // --- Select All ---
       if (settings.enableSelectAll) {
         const selectAllItem = document.createElement("div")
         selectAllItem.className = "cm-menu-item"
@@ -173,6 +227,7 @@ export function contextMenuExtension(options = {}) {
         menu.appendChild(separator)
       }
 
+      // --- Custom Items ---
       settings.customItems.forEach(item => {
         const row = document.createElement("div")
         row.className = "cm-menu-item"
@@ -194,7 +249,7 @@ export function contextMenuExtension(options = {}) {
 
       const remove = () => menu.remove()
       setTimeout(() => {
-        document.addEventListener("click", remove, {once: true})
+        document.addEventListener("click", remove, { once: true })
       }, 0)
     }
   })
