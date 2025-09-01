@@ -6,16 +6,16 @@ This package serves the people who need to have a custom and clean context menu.
 ![Screenshot](README/screenshot.png)
 ## Get Started
 
-Clone the project
+Install the npm package
 
 ```bash
-  git clone https://github.com/Yousefx10/codemirror-context-menu
+	npm install @esbitan/codemirror-context-menu
 ```
 
 Import project to your main javascript code
 
 ```bash
-import {contextMenuExtension} from "cm-context-menu"
+	import {contextMenuExtension} from "@esbitan/codemirror-context-menu"
 ```
 
 Add it to the EXTENSIONS

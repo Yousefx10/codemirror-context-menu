@@ -1,5 +1,5 @@
 {
-  "name": "codemirror-context-menu",
+  "name": "@esbitan/codemirror-context-menu",
   "version": "1.0.0",
   "description": "A custom context menu extension for CodeMirror 6",
   "main": "src/index.js",
