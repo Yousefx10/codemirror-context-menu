@@ -89,3 +89,9 @@ const editor = new EditorView({
 })
 
 ```
+---
+### DARK or LIGHT theme
+```javascript
+// by default it's dark theme for the context menu, to change it to light just update the theme value
+contextMenuExtension({ theme: "light" })
+```
