@@ -12,7 +12,7 @@ export function contextMenuExtension(options = {}) {
     enableCut: options.enableCut ?? true,
     enablePaste: options.enablePaste ?? true,
     enableSelectAll: options.enableSelectAll ?? true,
-    customItems: options.customItems ?? []   //This is for Custom Items that is added through the EXTENSIONS block in main javascript file
+    customItems: options.customItems ?? []   //This is for Custom Items that is added through the EXTENSIONS block in main javascript file 
   }
 
   return EditorView.domEventHandlers({
@@ -78,7 +78,7 @@ export function contextMenuExtension(options = {}) {
         })
       }
       
-      // Render copy/cut/paste if any are enabled
+      // Render copy/cut/paste if any are enabled 
       if (group.length > 0) {
         group.forEach(item => {
           const row = document.createElement("div")
@@ -88,6 +88,7 @@ export function contextMenuExtension(options = {}) {
             <span class="cm-shortcut">${item.shortcut}</span>
           `
           row.addEventListener("click", () => {
+            view.focus()       // restore focus to the editor
             item.command(view)
             menu.remove()
           })
@@ -111,6 +112,7 @@ export function contextMenuExtension(options = {}) {
           <span class="cm-shortcut">Ctrl+A</span>
         `
         selectAllItem.addEventListener("click", () => {
+          view.focus()   // restore focus to the editor
           selectAll(view)
           const range = document.createRange()
           range.selectNodeContents(view.contentDOM)
@@ -138,7 +140,8 @@ export function contextMenuExtension(options = {}) {
           ${item.shortcut ? `<span class="cm-shortcut">${item.shortcut}</span>` : ""}
         `
         row.addEventListener("click", () => {
-          item.command(view)   // call user function
+          view.focus()   // restore focus to the editor
+          item.command(view)
           menu.remove()
         })
         menu.appendChild(row)
