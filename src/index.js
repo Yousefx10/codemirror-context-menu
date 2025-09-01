@@ -60,6 +60,7 @@ function injectMenuStyles(theme) {
       font-size: 12px;
       border: 1px solid ${theme === "dark" ? "#444" : "#bbb"};
       background: ${theme === "dark" ? "#2f2f2f" : "#f5f5f5"};
+      color: ${theme === "dark" ? "white" : "black"}; //good visibility
     }
     .cm-btn:hover {
       background: ${theme === "dark" ? "#454545" : "#e0e0e0"};
