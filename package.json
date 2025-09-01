@@ -1,0 +1,27 @@
+{
+  "name": "codemirror-context-menu",
+  "version": "1.0.0",
+  "description": "A custom context menu extension for CodeMirror 6",
+  "main": "src/index.js",
+  "type": "module",
+  "keywords": [
+    "codemirror",
+    "codemirror6",
+    "contextmenu",
+    "extension"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yousefx10/codemirror-context-menu"
+  },
+  "author": "Yousef Khaled Esbitan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Yousefx10/codemirror-context-menu/issues"
+  },
+  "homepage": "https://github.com/Yousefx10/codemirror-context-menu#readme",
+  "peerDependencies": {
+    "@codemirror/view": "^6.0.0",
+    "@codemirror/commands": "^6.0.0"
+  }
+}
