@@ -1,6 +1,18 @@
 import {EditorView} from "@codemirror/view"
 import {selectAll, undo, redo} from "@codemirror/commands"
 
+
+// This function is responsible to add a separator, with a checker to make sure there's an item below the separator, all logic conditions is made through the WillHaveMore when function called.
+function appendSeparator(menu, willHaveMore) {
+  if (!willHaveMore) return
+  if (menu.lastChild && menu.lastChild.classList.contains("cm-separator")) return
+  const sep = document.createElement("div")
+  sep.className = "cm-separator"
+  menu.appendChild(sep)
+}
+
+
+
 function getSelectedText(view) {
   const {from, to} = view.state.selection.main
   return view.state.doc.sliceString(from, to)
@@ -120,17 +132,14 @@ export function contextMenuExtension(options = {}) {
         })
         menu.appendChild(undoRedoRow)
 
-        if (
+        appendSeparator(menu,
           settings.enableCopy ||
           settings.enableCut ||
           settings.enablePaste ||
           settings.enableSelectAll ||
           settings.customItems.length > 0
-        ) {
-          const sep = document.createElement("div")
-          sep.className = "cm-separator"
-          menu.appendChild(sep)
-        }
+        )
+
       }
 
       // --- Copy, Cut, Paste group ---
@@ -195,11 +204,8 @@ export function contextMenuExtension(options = {}) {
         })
       }
 
-      if (group.length > 0 && (settings.enableSelectAll || settings.customItems.length > 0)) {
-        const separator = document.createElement("div")
-        separator.className = "cm-separator"
-        menu.appendChild(separator)
-      }
+      appendSeparator(menu, group.length > 0 && (settings.enableSelectAll || settings.customItems.length > 0))
+
 
       // --- Select All ---
       if (settings.enableSelectAll) {
@@ -220,13 +226,12 @@ export function contextMenuExtension(options = {}) {
           menu.remove()
         })
         menu.appendChild(selectAllItem)
+
+        appendSeparator(menu, settings.customItems.length > 0)
+
       }
 
-      if (settings.customItems.length > 0) {
-        const separator = document.createElement("div")
-        separator.className = "cm-separator"
-        menu.appendChild(separator)
-      }
+
 
       // --- Custom Items ---
       settings.customItems.forEach(item => {
