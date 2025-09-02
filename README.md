@@ -9,50 +9,47 @@ This package serves the people who need to have a custom and clean context menu.
 Install the npm package
 
 ```bash
-	npm install @esbitan/codemirror-context-menu
+npm install @esbitan/codemirror-context-menu
 ```
 
 Import project to your main javascript code
 
 ```bash
-	import {contextMenuExtension} from "@esbitan/codemirror-context-menu"
+import {contextMenuExtension} from "@esbitan/codemirror-context-menu"
 ```
 
 Add it to the EXTENSIONS
 
 ```bash
-      extensions: [
-        contextMenuExtension({})
-      ]
+extensions: [
+    contextMenuExtension({})
+    ]
 ```
 ## Available variables
 
 There's a good set of variables which allows you to control how the context menu acts
 ```javascript
-    enableUndoRedo: true,
-    enableCopy: true,
-    enableCut: true,
-    enablePaste: true,
-    enableSelectAll: true,
-    theme: "light" //[dark] / [light]
+enableUndoRedo: true,
+enableCopy: true,
+enableCut: true,
+enablePaste: true,
+enableSelectAll: true,
+theme: "light" //[dark] / [light]
 ```
 ## Custom item
 
 You still can add your own item inside the context menu, and point it to specific function
 
 ```bash
-  customItems[
-    {
-        label: "Example name",
-        shortcut: "Ctrl+Shift+F",
-        command: (view) => {
-
-            // user-defined function
-            DoSomething();
-
+customItems:
+[{
+    label: "Example name",
+    shortcut: "Ctrl+Shift+F",
+    command: (view) => {
+        // user-defined function
+        DoSomething();
         }
-    }
-  ]
+}]
 ```
 
 ## Table Guide
