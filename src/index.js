@@ -74,6 +74,31 @@ function injectMenuStyles(theme) {
       background: ${theme === "dark" ? "#2f2f2f" : "#f5f5f5"};
       color: ${theme === "dark" ? "white" : "black"}; //good visibility
     }
+
+/* Compact undo/redo row (enableUndoRedo === false) */
+.cm-undo-redo-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  padding: 4px;
+}
+
+/* Buttons inside compact row */
+.cm-undo-redo-row button {
+  flex: 1;
+  padding: 4px 6px;
+  border: none; /* pill-like, no border */
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  background: ${theme === "dark" ? "#444" : "#eee"};
+  color: ${theme === "dark" ? "#fff" : "#000"};
+}
+
+.cm-undo-redo-row button:hover {
+  background: ${theme === "dark" ? "#666" : "#ddd"};
+}
+
     .cm-btn:hover {
       background: ${theme === "dark" ? "#454545" : "#e0e0e0"};
     }
@@ -92,7 +117,11 @@ export function contextMenuExtension(options = {}) {
     enableCut: options.enableCut ?? true,
     enablePaste: options.enablePaste ?? true,
     enableSelectAll: options.enableSelectAll ?? true,
-    enableUndoRedo: options.enableUndoRedo ?? true, // option to enable or disable the UNDO + REDO, it's enabled by default
+
+    enableUndoRedo: Object.prototype.hasOwnProperty.call(options, "enableUndoRedo")
+      ? options.enableUndoRedo  // true | false | null
+      : true, // option to enable or disable the UNDO + REDO, it's enabled by default.
+
     customItems: options.customItems ?? [],
     theme: options.theme ?? "dark"   // default = dark
   }
@@ -108,39 +137,72 @@ export function contextMenuExtension(options = {}) {
       const menu = document.createElement("div")
       menu.className = "cm-context-menu"
 
-      // --- Undo/Redo row ---
-      if (settings.enableUndoRedo) {
-        const undoRedoRow = document.createElement("div")
-        undoRedoRow.className = "cm-menu-item"
-        undoRedoRow.innerHTML = `
-          <span class="cm-label">History</span>
-          <div class="cm-undo-redo">
-            <button class="cm-btn">Undo</button>
-            <button class="cm-btn">Redo</button>
-          </div>
-        `
-        const [undoBtn, redoBtn] = undoRedoRow.querySelectorAll(".cm-btn")
-        undoBtn.addEventListener("click", () => {
-          view.focus()
-          undo(view)
-          menu.remove()
-        })
-        redoBtn.addEventListener("click", () => {
-          view.focus()
-          redo(view)
-          menu.remove()
-        })
-        menu.appendChild(undoRedoRow)
+// --- Undo/Redo row (tri-state: true = history; false = compact; null = hidden) ---
+if (settings.enableUndoRedo !== null) {
+  if (settings.enableUndoRedo === true) {
+    // ----- ORIGINAL "History" style (with label) -----
+    const undoRedoRow = document.createElement("div")
+    undoRedoRow.className = "cm-menu-item"
+    undoRedoRow.innerHTML = `
+      <span class="cm-label">History</span>
+      <div class="cm-undo-redo">
+        <button class="cm-btn">Undo</button>
+        <button class="cm-btn">Redo</button>
+      </div>
+    `
+    const [undoBtn, redoBtn] = undoRedoRow.querySelectorAll(".cm-btn")
+    undoBtn.addEventListener("click", () => {
+      view.focus()
+      undo(view)
+      menu.remove()
+    })
+    redoBtn.addEventListener("click", () => {
+      view.focus()
+      redo(view)
+      menu.remove()
+    })
+    menu.appendChild(undoRedoRow)
 
-        appendSeparator(menu,
-          settings.enableCopy ||
-          settings.enableCut ||
-          settings.enablePaste ||
-          settings.enableSelectAll ||
-          settings.customItems.length > 0
-        )
+  } else {
+    // ----- NEW "compact row" style (no label, full width buttons) -----
+    const compactRow = document.createElement("div");
+    compactRow.className = "cm-undo-redo-row";
 
-      }
+    const undoBtn = document.createElement("button");
+    undoBtn.textContent = "Undo";
+    undoBtn.addEventListener("click", () => {
+      view.focus();
+      undo(view);
+      menu.remove();
+    });
+
+    const redoBtn = document.createElement("button");
+    redoBtn.textContent = "Redo";
+    redoBtn.addEventListener("click", () => {
+      view.focus();
+      redo(view);
+      menu.remove();
+    });
+
+    compactRow.appendChild(undoBtn);
+    compactRow.appendChild(redoBtn);
+    menu.appendChild(compactRow);
+  }
+
+
+  // keep separator logic the same
+  if (
+    settings.enableCopy ||
+    settings.enableCut ||
+    settings.enablePaste ||
+    settings.enableSelectAll ||
+    settings.customItems.length > 0
+  ) {
+    const sep = document.createElement("div")
+    sep.className = "cm-separator"
+    menu.appendChild(sep)
+  }
+}
 
       // --- Copy, Cut, Paste group ---
       const group = []
