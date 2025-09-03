@@ -1,6 +1,6 @@
 {
   "name": "@esbitan/codemirror-context-menu",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A custom context menu extension for CodeMirror 6",
   "main": "src/index.js",
   "type": "module",
@@ -8,7 +8,9 @@
     "codemirror",
     "codemirror6",
     "contextmenu",
-    "extension"
+    "extension",
+    "esbitan",
+    "clipboard"
   ],
   "repository": {
     "type": "git",
@@ -25,4 +27,3 @@
     "@codemirror/commands": "^6.0.0"
   }
 }
-
