@@ -72,7 +72,7 @@ function injectMenuStyles(theme) {
       font-size: 12px;
       border: 1px solid ${theme === "dark" ? "#444" : "#bbb"};
       background: ${theme === "dark" ? "#2f2f2f" : "#f5f5f5"};
-      color: ${theme === "dark" ? "white" : "black"}; //good visibility
+      color: ${theme === "dark" ? "white" : "black"}; /*good visibility*/
     }
 
 /* Compact undo/redo row (enableUndoRedo === false) */
@@ -86,7 +86,7 @@ function injectMenuStyles(theme) {
 /* Buttons inside compact row */
 .cm-undo-redo-row button {
   flex: 1;
-  padding: 4px 6px;
+  padding: 7px 6px;
   border: none; /* pill-like, no border */
   border-radius: 4px;
   cursor: pointer;
